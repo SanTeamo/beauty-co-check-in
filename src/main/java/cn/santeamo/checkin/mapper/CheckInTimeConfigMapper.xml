@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.santeamo.checkin.mapper.CheckInTimeConfigMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.santeamo.checkin.entity.CheckInTimeConfig">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="weekday" jdbcType="INTEGER" property="weekday" />
+        <result column="work_in_time" jdbcType="TIME" property="workInTime" />
+        <result column="work_out_time" jdbcType="TIME" property="workOutTime" />
+        <result column="deleted" jdbcType="INTEGER" property="deleted" />
+    </resultMap>
+    <resultMap id="BaseVOResultMap" extends="BaseResultMap"
+               type="cn.santeamo.checkin.vo.CheckInTimeConfigVO">
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, weekday, work_in_time, work_out_time, deleted
+    </sql>
+    <sql id="Alias_Base_Column_List">
+        tcitc.id, tcitc.weekday, tcitc.work_in_time, tcitc.work_out_time, tcitc.deleted
+    </sql>
+
+    <select id="selectVOPage" resultMap="BaseVOResultMap">
+        select
+        <include refid="Alias_Base_Column_List"/>
+        from t_check_in_time_config tcitc
+        where tcitc.deleted = 0
+    </select>
+</mapper>

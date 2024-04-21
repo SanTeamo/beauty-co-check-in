@@ -1,0 +1,61 @@
+spring:
+  profiles:
+    active: dev
+    include: other
+  datasource:
+    hikari:
+      max-lifetime: 300000
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+  rabbitmq:
+    template:
+      mandatory: true
+      reply-timeout: 30000
+    # 手动提交消息
+    listener:
+      simple:
+        acknowledge-mode: manual
+        prefetch: 250
+        retry:
+          # 设置为60秒这样就有足够的时间来处理代码逻辑
+          initial-interval: 60000
+          #启用发布重试
+          enabled: true
+          #传递消息的最大尝试次数
+          max-attempts: 3
+          #尝试的最大时间间隔
+          max-interval: 60000
+          #应用于先前传递重试时间间隔的乘数
+          multiplier: 1.0
+    # 开启发送确认；确认消息已发送到交换机(Exchange)
+    publisher-confirm-type: correlated
+    # 开启发送失败退回；确认消息已发送到队列(Queue)
+    publisher-returns: true
+logging:
+  config: classpath:logback/logback-${spring.profiles.active}.xml
+# mybatis
+mybatis-plus:
+  mapper-locations: classpath:cn/santeamo/**/mapper/*Mapper.xml
+  # 实体扫描，多个package用逗号或者分号分隔
+  typeAliasesPackage: cn.santeamo.**.entity
+  global-config:
+    # 关闭MP3.0自带的banner
+    banner: false
+    db-config:
+      #主键类型  0:"数据库ID自增", 1:"不操作", 2:"用户输入ID",3:"数字型snowflake", 4:"全局唯一ID UUID", 5:"字符串型snowflake";
+      id-type: assign_id
+      #字段策略
+      insert-strategy: not_null
+      update-strategy: not_null
+      where-strategy: not_empty
+      #驼峰下划线转换
+      table-underline: true
+      # 逻辑删除配置
+      # 逻辑未删除全局值（0表示未删除，这也是Mybatis Plus的默认配置）
+      logic-not-delete-value: 0
+      # 逻辑删除全局值（1表示已删除，这也是Mybatis Plus的默认配置）
+      logic-delete-value: 1
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
