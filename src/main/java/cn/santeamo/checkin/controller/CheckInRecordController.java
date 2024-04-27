@@ -1,16 +1,18 @@
 package cn.santeamo.checkin.controller;
 
 import cn.santeamo.checkin.dto.CheckInRecordSearchDTO;
-import cn.santeamo.checkin.entity.CheckInRecord;
 import cn.santeamo.checkin.service.ICheckInRecordService;
 import cn.santeamo.checkin.vo.CheckInRecordVO;
 import cn.santeamo.common.result.Result;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 /**
  * <p>
@@ -57,5 +59,14 @@ public class CheckInRecordController {
     @ApiOperation(value = "打卡", notes = "打卡")
     public Result<?> checkIn() {
         return service.checkIn();
+    }
+
+    /**
+     * 分页获取
+     */
+    @PostMapping("/upload-record")
+    @ApiOperation(value = "打卡", notes = "打卡")
+    public Result<?> uploadRecord(@RequestBody Map<String, ObjectNode> uploadRecord) {
+        return service.uploadRecord(uploadRecord);
     }
 }

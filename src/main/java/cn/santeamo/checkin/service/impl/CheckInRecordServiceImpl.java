@@ -9,17 +9,23 @@ import cn.santeamo.checkin.service.ICheckInRecordService;
 import cn.santeamo.checkin.service.ICheckInTimeConfigService;
 import cn.santeamo.checkin.vo.CheckInRecordVO;
 import cn.santeamo.common.result.Result;
+import cn.santeamo.common.util.JsonUtil;
 import cn.santeamo.common.util.ParamUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>
@@ -107,5 +113,34 @@ public class CheckInRecordServiceImpl
             return Result.success("打卡成功");
         }
         return Result.success("打卡失败");
+    }
+
+    @Override
+    public Result<?> uploadRecord(Map<String, ObjectNode> uploadRecord) {
+        final Set<String> dateSet = uploadRecord.keySet();
+        CheckInRecord checkInRecord, recordInDb;
+        final List<CheckInRecord> updateList = Lists.newArrayList();
+        for (String date : dateSet) {
+            checkInRecord = JsonUtil.treeToValue(uploadRecord.get(date), CheckInRecord.class);
+            if (checkInRecord == null) {
+                throw new RuntimeException("上传数据解析失败");
+            }
+            recordInDb = getOne(Wrappers.lambdaQuery(CheckInRecord.class)
+                .eq(CheckInRecord::getDate, date)
+            );
+            if (recordInDb != null) {
+                checkInRecord.setId(recordInDb.getId());
+                // 以服务器为准
+                if (recordInDb.getWorkInTime() != null) {
+                    checkInRecord.setWorkInTime(null);
+                    checkInRecord.setWorkInState(null);
+                }
+            }
+            updateList.add(checkInRecord);
+        }
+        if (updateList.size() > 0) {
+            return Result.status(saveOrUpdateBatch(updateList));
+        }
+        return Result.status(true);
     }
 }

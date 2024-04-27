@@ -6,6 +6,9 @@ import cn.santeamo.checkin.vo.CheckInRecordVO;
 import cn.santeamo.common.result.Result;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import java.util.Map;
 
 /**
  * <p>
@@ -42,4 +45,6 @@ public interface ICheckInRecordService extends IService<CheckInRecord> {
     Result<?> submit(CheckInRecord entity);
 
     Result<?> checkIn();
+
+    Result<?> uploadRecord(Map<String, ObjectNode> uploadRecord);
 }
